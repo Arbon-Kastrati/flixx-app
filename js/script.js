@@ -1,6 +1,49 @@
 const global = {
     currentPage: window.location.pathname,
 };
+const popularMoviesContainer = document.getElementById('popular-movies');
+const API_URL = 'https://api.themoviedb.org/3';
+
+async function displayPopularMovies() {
+    const { results } = await fetchAPIData('movie/popular');
+    results.forEach((movie) => {
+        const div = document.createElement('div');
+        div.classList.add('card');
+        div.innerHTML = `
+            <a href="movie-details.html?id=${movie.id}">
+                ${
+                    movie.poster_path
+                        ? `<img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" class="card-img-top" alt="${movie.title}"/>`
+                        : '<img src="images/no-image.jpg" class="card-img-top" alt="Movie Title"/>'
+                }
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">${movie.title}</h5>
+                <p class="card-text">
+                    <small class="text-muted">Release: ${movie.release_date}</small>
+                </p>
+            </div>`;
+        popularMoviesContainer.appendChild(div);
+    });
+}
+
+async function fetchAPIData(endpoint) {
+    const API_KEY = '17814947e35171f5f39bfd2456c4fedb';
+    const API_URL = 'https://api.themoviedb.org/3/';
+    showSpinner();
+    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
+    const data = await response.json();
+    hideSpinner();
+    return data;
+}
+
+function showSpinner() {
+    document.querySelector('div.spinner').classList.add('show');
+}
+
+function hideSpinner() {
+    document.querySelector('div.spinner').classList.remove('show');
+}
 
 //highlight the active link
 const highlightActiveLink = () => {
@@ -17,6 +60,7 @@ function init() {
         case '/':
         case '/index.html':
             highlightActiveLink('movies');
+            displayPopularMovies();
             break;
         case '/shows.html':
             highlightActiveLink('shows');
@@ -36,4 +80,3 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
-// document.querySelector('nav ul').addEventListener('click', highlightActiveLink);
