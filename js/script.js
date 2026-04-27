@@ -72,7 +72,7 @@ async function displayMovieDetails() {
             <h2>${movie.original_title}</h2>
             <p>
               <i class="fas fa-star text-primary"></i>
-            $${movie.vote_average.toFixed(1)} / 10
+            ${movie.vote_average.toFixed(1)} / 10
             </p>
             <p class="text-muted">Release Date: ${movie.release_date}</p>
             <p>
@@ -119,7 +119,7 @@ async function displayShowDetails() {
                     <div>
                     ${
                         show.backdrop_path
-                            ? `<img src="https://image.tmdb.org/t/p/w500/${show.backdrop_path}" class="card-img-top" alt="Show Name" />`
+                            ? `<img src="https://image.tmdb.org/t/p/w500/${show.backdrop_path}" class="card-img-top" alt="${show.original_name}" />`
                             : '<img src="images/no-image.jpg" class="card-img-top" alt="Show Name" />'
                     }
                     </div>
@@ -180,6 +180,48 @@ function hideSpinner() {
     document.querySelector('div.spinner').classList.remove('show');
 }
 
+async function displaySlider() {
+    const { results } = await fetchAPIData('movie/now_playing');
+    results.forEach((movie) => {
+        const div = document.createElement('div');
+        div.classList.add('swiper-slide');
+        div.innerHTML = `
+            <a href="movie-details.html?id=${movie.id}">
+            ${`<img src="https://image.tmdb.org/t/p/w500/${movie.backdrop_path}" class="card-img-top" alt="${movie.original_name}" />`}
+            </a>
+            <h4 class="swiper-rating">
+              <i class="fas fa-star text-secondary"></i>${movie.vote_average.toFixed(1)} / 10
+            </h4>
+        `;
+        document.querySelector('div.swiper-wrapper').appendChild(div);
+        initSwiper();
+    });
+}
+
+function initSwiper() {
+    const swiper = new Swiper('.swiper', {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        freeMode: true,
+        loop: true,
+        autoplay: {
+            delay: 4000,
+            disableOnInteraction: false,
+        },
+        breakpoints: {
+            500: {
+                slidesPerView: 2,
+            },
+            700: {
+                slidesPerView: 3,
+            },
+            1200: {
+                slidesPerView: 4,
+            },
+        },
+    });
+}
+
 function displayBackgroundImage(backgroundFor, backgroundPath) {
     const overlyDiv = document.createElement('div');
 
@@ -196,9 +238,7 @@ function displayBackgroundImage(backgroundFor, backgroundPath) {
     overlyDiv.style.opacity = '0.1';
     console.log(overlyDiv);
     if (backgroundFor === 'movie') {
-        console.log('backgroundFor is movie');
         popularMovieDetailsContainer.appendChild(overlyDiv);
-        console.log(popularMovieDetailsContainer);
     } else if (backgroundFor === 'show') {
         popularShowDetailsContainer.appendChild(overlyDiv);
     }
@@ -219,6 +259,7 @@ function init() {
         case '/':
         case '/index.html':
             displayPopularMovies();
+            displaySlider();
             break;
         case '/shows.html':
             displayPopularShows();
