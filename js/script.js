@@ -187,6 +187,7 @@ async function search() {
         global.search.totalResults = total_results;
         if (global.search.results.length === 0) {
             showAlert('No results were found');
+            displayPagination();
         } else {
             displaySearchResults();
         }
@@ -204,7 +205,6 @@ async function prevSearch() {
 async function nextSearch() {
     global.search.page++;
     ({ results: global.search.results } = await fetchAPIDataWithQuery());
-    console.log(global.search.results);
     displaySearchResults();
 }
 
@@ -247,6 +247,8 @@ function displayPagination() {
     const nextBtn = document.getElementById('next');
     checkIfPaginationBtnIsDisabled(prevBtn);
     checkIfPaginationBtnIsDisabled(nextBtn);
+    prevBtn.addEventListener('click', prevSearch);
+    nextBtn.addEventListener('click', nextSearch);
     pageCounter.innerHTML = `<div class="page-counter">Page ${global.search.page} of ${global.search.totalPages}</div>`;
     paginationContainer.appendChild(pageCounter);
 }
@@ -394,9 +396,6 @@ function init() {
             break;
     }
     highlightActiveLink();
-
-    document.getElementById('prev').addEventListener('click', prevSearch);
-    document.getElementById('next').addEventListener('click', nextSearch);
 }
 
 document.addEventListener('DOMContentLoaded', init);
