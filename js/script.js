@@ -1,5 +1,5 @@
 const global = {
-    currentPage: window.location.pathname,
+    currentPage: '/' + window.location.pathname.split('/').pop(),
     searchQuery: window.location.search,
     api: {
         key: '17814947e35171f5f39bfd2456c4fedb',
