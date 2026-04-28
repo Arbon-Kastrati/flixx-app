@@ -187,7 +187,6 @@ async function search() {
         global.search.totalResults = total_results;
         if (global.search.results.length === 0) {
             showAlert('No results were found');
-            displayPagination();
         } else {
             displaySearchResults();
         }
@@ -241,29 +240,18 @@ function displayHeadingForSearchResults() {
 
 function displayPagination() {
     const paginationContainer = document.querySelector('#pagination .pagination');
-    const pageCounter = document.createElement('div');
-    document.querySelector('.page-counter') && document.querySelector('.page-counter').remove();
+    paginationContainer.innerHTML = '';
+    paginationContainer.innerHTML = `
+                    <button class="btn btn-primary" id="prev" ${global.search.page === 1 ? 'disabled' : ''}>Prev</button>
+                    <button class="btn btn-primary" id="next" ${global.search.page === global.search.totalPages ? 'disabled' : ''}>Next</button>
+                    <div class="page-counter">Page ${global.search.page} of ${global.search.totalPages}</div>
+                    `;
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
-    checkIfPaginationBtnIsDisabled(prevBtn);
-    checkIfPaginationBtnIsDisabled(nextBtn);
     prevBtn.addEventListener('click', prevSearch);
     nextBtn.addEventListener('click', nextSearch);
-    pageCounter.innerHTML = `<div class="page-counter">Page ${global.search.page} of ${global.search.totalPages}</div>`;
-    paginationContainer.appendChild(pageCounter);
 }
 
-function checkIfPaginationBtnIsDisabled(btn) {
-    if (btn.getAttribute('id') === 'next') {
-        if (global.search.page === global.search.totalPages) {
-            btn.disabled = true;
-        } else btn.disabled = false;
-    } else if (btn.getAttribute('id') === 'prev') {
-        if (global.search.page === 1) {
-            btn.disabled = true;
-        } else btn.disabled = false;
-    }
-}
 async function fetchAPIData(endpoint) {
     showSpinner();
     const response = await fetch(
